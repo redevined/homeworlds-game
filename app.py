@@ -1,19 +1,24 @@
 #!/usr/bin/env python
 
-from flask import Flask
+from flask import *
 app = Flask(__name__)
 
 @app.route("/")
 def home() :
-    return "It works, bitches."
+    return render_template("home.html")
 
 @app.route("/play")
-def join() :
+def play() :
+    if not session.get("logged_in") :
+        return redirect("/login")
     return "You will find the game here. Not yet, someday."
 
-@app.route("/play/<int:gameID>")
-def play(gameID) :
-    return "Looking for game #" + gameID + "? Obviously not here."
+@app.route("/login", methods=["GET", "POST"])
+def login() :
+    if request.method == "POST" :
+        if request.form["username"] == "admin" and request.form["password"] == "1234" :
+            return "Nice try."
+    return render_template("login.html")
 
 @app.route("/rules")
 def rules() :
