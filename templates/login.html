@@ -1,6 +1,9 @@
 {% extends "template.html" %}
 {% block content %}
-  <form method="post">
+  {% for msg in get_flashed_messages() %}
+    <div>{{ msg }}</div>
+  {% endfor %}
+  <form method="POST">
     <p>
       Username: <input type="text" name="username">
     </p>
@@ -11,4 +14,7 @@
       <input type="submit" value="Login">
     </p>
   </form>
+  <p>
+    No yet registered? Then <a href="/register">sign up</a> to play!
+  </p>
 {% endblock %}
