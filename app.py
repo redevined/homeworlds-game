@@ -15,7 +15,7 @@ def home() :
 def play() :
     if not session.get("user") :
         return redirect("/login")
-    return "You will find the game here. Not yet, someday."
+    return render_template("portal.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login() :
@@ -46,11 +46,11 @@ def register() :
 
 @app.route("/rules")
 def rules() :
-    return "The first rule of this game is the first rule of this game."
+    return render_template("rules.html")
 
 @app.route("/about")
 def about() :
-    return "This is a page about this page."
+    return render_template("about.html")
 
 
 if __name__ == "__main__" :
