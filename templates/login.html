@@ -1,20 +1,12 @@
 {% extends "template.html" %}
 {% block content %}
-  {% for msg in get_flashed_messages() %}
-    <div>{{ msg }}</div>
-  {% endfor %}
-  <form method="POST">
-    <p>
-      Username: <input type="text" name="username">
-    </p>
-    <p>
-      Password: <input type="password" name="password">
-    </p>
-    <p>
-      <input type="submit" value="Login">
-    </p>
-  </form>
-  <p>
-    No yet registered? Then <a href="/register">sign up</a> to play!
-  </p>
+    {% for msg in get_flashed_messages() %}
+        <div class="flash">{{ msg }}</div>
+    {% endfor %}
+    <form method="POST">
+        <p>Username: <input type="text" name="username"></p>
+        <p>Password: <input type="password" name="password"></p>
+        <p><input type="submit" value="Login"></p>
+    </form>
+    <p>No yet registered? Then <a href="/register">sign up</a> to play!</p>
 {% endblock %}

@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Homeworlds online</title>
-  </head>
-  <body>
-    <div>
-      {% block content %}
-      {% endblock %}
-    </div>
-  </body>
+    <head>
+        <title>Homeworlds online</title>
+        <style type="text/css">
+            @font-face { font-family: Exo; src: url({{ url_for('static', filename='font/Exo.otf') }}); }
+        </style>
+        <link href="{{ url_for('static', filename='css/style.css') }}" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+        <div id="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </body>
 </html>

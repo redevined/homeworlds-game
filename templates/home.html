@@ -1,12 +1,14 @@
 {% extends "template.html" %}
 {% block content %}
-  <p>
-    <a href="/play">Play!</a>
-  </p>
-  <p>
-    <a href="/rules">Rules</a>
-  </p>
-  <p>
-    <a href="/about">About</a>
-  </p>
+    <div class="hcontainer">
+        <div>
+            <a href="/rules" class="button">Rules</a>
+        </div>
+        <div class="hmain">
+            <a href="/play" class="button">Play!</a>
+        </div>
+        <div>
+            <a href="/about" class="button">About</a>
+        </div>
+    </div>
 {% endblock %}
