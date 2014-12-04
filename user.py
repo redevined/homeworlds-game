@@ -11,13 +11,20 @@ class User() :
 
     def __init__(self, un, pw, mail) :
         self.username = un
-        self.password = pw
+        self.password = hash(pw)
         self.email = mail
         self.role = "USER"
+
+    def checkPassword(self, pw) :
+        return self.password == hash(pw)
 
     def isAdmin(self) :
         return self.role == "ADMIN"
 
+
+def hash(msg) :
+    sha = hashlib.sha1(msg)
+    return sha.hexdigest()
 
 def addSession(user) :
     usid = len(SESSIONS) + 100
@@ -35,7 +42,7 @@ def getByLogin(credentials) :
     if os.path.exists(path) :
         with open(path, "r") as f :
             user = serializer.load(f)
-        if user.password == hash(credentials["password"]) :
+        if user.checkPassword(credentials["password"]) :
             return addSession(user)
     return None
 
@@ -44,12 +51,8 @@ def getByRegister(credentials) :
     path = os.path.join("users", un + ".p")
 
     if un and pw and (mail or nomail) and not os.path.exists(path) :
-        user = User(un, hash(pw), None if nomail else mail)
+        user = User(un, pw, None if nomail else mail)
         with open(path, "w") as f :
             serializer.dump(user, f)
         return addSession(user)
     return None
-
-def hash(msg) :
-    sha = hashlib.sha1(msg)
-    return sha.hexdigest()
