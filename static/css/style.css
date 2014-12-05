@@ -69,6 +69,11 @@ div.hcontainer > div.hmain {
     border-radius: 50%;
 }
 
+div.hmain > a.button:hover {
+    color: #488cad;
+    background-color: #ffffff;
+}
+
 div.flash {
 
 }
