@@ -1,0 +1,28 @@
+{% extends "template.html" %}
+{% block content %}
+<div>
+    <h1>Admin Interface</h1>
+    <h2>Sessions</h2>
+    {% for (usid, user) in sessions %}
+        <p>
+            {{ usid }} |
+            {{ user.username }}
+        </p>
+    {% endfor %}
+    <h2>All Users</h2>
+    {% for user in users %}
+    <p>
+        {{ user.username }} |
+        {{ user.password }} |
+        {{ user.mail }} |
+        {{ user.role }}
+    </p>
+    {% endfor %}
+    <h2>All Games</h2>
+    {% for game in games %}
+    <p>
+        {{ game }}
+    </p>
+    {% endfor %}
+</div>
+{% endblock %}
