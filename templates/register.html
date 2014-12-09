@@ -1,6 +1,7 @@
 {% extends "template.html" %}
+{% block style %}register{% endblock %}
+
 {% block content %}
-<div class="container">
     <h2>Register your account!</h2>
     {% for msg in get_flashed_messages() %}
         <div class="flash">{{ msg }}</div>
@@ -29,5 +30,4 @@
         Please note that we won't use your E-Mail for anything other than notifications about your games.
         Information about your person will never be given to other people.
     </p>
-</div>
 {% endblock %}

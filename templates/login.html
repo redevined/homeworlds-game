@@ -1,6 +1,7 @@
 {% extends "template.html" %}
+{% block style %}login{% endblock %}
+
 {% block content %}
-<div class="container">
     <h2>Login</h2>
     {% for msg in get_flashed_messages() %}
         <div class="flash">{{ msg }}</div>
@@ -19,5 +20,4 @@
         </div>
     </form>
     <p>Not yet registered? Then <a href="/register">sign up</a> to play!</p>
-</div>
 {% endblock %}

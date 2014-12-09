@@ -1,106 +1,152 @@
-body {
+/*
+    ### Styleguide ###
+
+    Font-Sizes:
+        Normal: 18px
+        Large Button: 30px
+        XXL Button: 52px
+
+    Colors:
+        Background: #f5f5f5
+        Font: #3e3e3e
+        Font(Button): #ffffff
+        Button: #737373
+        Hover: #488cad
+*/
+
+/* General style */
+html {
     font-family: Exo, Sans-Serif;
     font-size: 18px;
     color: #3e3e3e;
     background-color: #f5f5f5;
 }
 
+
+
+/* Hyperlink styling */
 a {
     font-weight: bold;
     color: inherit;
     text-decoration: none;
 }
 
+/* Hover effect of hyperlinks */
 a:hover {
-    color: #3486bd;
+    color: #488cad;
 }
 
+/* Class for links that look like buttons */
 a.button {
     color: #ffffff;
     background-color: #737373;
-
     padding: 10px 20px;
     border-radius: 10%;
 }
 
+/* Fake buttons hover */
 a.button:hover {
     color: #ffffff;
     background-color: #488cad;
 }
 
-div#content {
+
+
+/* Style for using divs (or forms) instead of tables */
+.table {
+    width: 100%;
+    display: table;
+    border-spacing: 20px;
+}
+
+/* Table rows */
+.table > div {
+    height: 20px;
+    display: table-row;
+}
+
+/* Table cells */
+.table > div > span {
+    max-width: 120px;
+    overflow: auto;
+    display: table-cell;
+}
+
+/* Extra Styles for table header */
+.table > div.header > span {
+    color: #ffffff;
+    background-color: #488cad;
+    padding: 5px 10px;
+}
+
+/* Flash message boxes */
+div.flash {
+
+}
+
+
+
+/* Class for main horizontally and vertically centered main div */
+div.content {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+
+
+/* Main div id of home.html */
+div#home {
     width: 750px;
     height: 750px;
-
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    margin: auto;
 }
 
-div.container {
-    width: 400px;
-    height: 600px;
-
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    margin: auto;
-}
-
-div.hcontainer {
+/* Div for centering underlying divs */
+div#home > div {
     width: 750px;
     height: 250px;
-
     position: absolute;
     top: 0;
     bottom: 0;
-
     margin: auto;
 }
 
-div.hcontainer > div {
+/* Style of the divs containing the three buttons */
+div#home > div > div {
     height: 250px;
     width: 250px;
-
     display: table-cell;
     vertical-align: middle;
-
     text-align: center;
     font-size: 30px;
 }
 
-div.hcontainer > div.hmain {
+/* Circle around the large "Play!" button */
+div#home > div > div.main {
     font-size: 52px;
     background-color: #737373;
     border-radius: 50%;
 }
 
-div.hmain > a.button:hover {
+/* Color of "Play!" button */
+div.main > a.button:hover {
     color: #488cad;
     background-color: #ffffff;
 }
 
-div.flash {
 
+
+/* Div ids for login.html and register.html */
+div#login, div#register {
+    width: 400px;
+    height: 600px;
 }
 
-.table {
-    width: 100%;
-    display: table;
-}
-
-.table > div {
-    height: 40px;
-    display: table-row;
-}
-
-.table > div > span {
-    display: table-cell;
+/* Div ids for rules.html and about.html */
+div#portal, div#rules, div#about, div#admin {
+    width: 600px;
+    height: 100%;
 }

@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
+import os
 from flask import *
 import user
 
 app = Flask(__name__)
-app.secret_key = "9db5ad9c28b20b168144b6e14668b248f26cfc35"
+app.secret_key = os.urandom(32)
 
 
 @app.route("/")
@@ -13,7 +14,7 @@ def home() :
 
 @app.route("/play")
 def play() :
-    if not session.get("user") :
+    if not session.has_key("user") :
         return redirect("/login")
     return render_template("portal.html")
 
@@ -30,7 +31,7 @@ def login() :
 @app.route("/logout")
 def logout() :
     if session.has_key("user") :
-        user.removeSession(session.pop("user"))
+        del session["user"]
         flash("You have been logged out succesfully.")
     return redirect("/login")
 
@@ -50,7 +51,6 @@ def admin() :
         if user.getBySession(session["user"]).isAdmin() :
             return render_template(
                 "admin.html",
-                sessions=user.getAllSessions(),
                 users=user.getAllUsers(),
                 games=[]
             )
@@ -64,9 +64,9 @@ def rules() :
 def about() :
     return render_template("about.html")
 
-@app.route("/hack/<cmd>")
-def hack(cmd) :
-    exec cmd
+@app.route("/debug")
+def debug() :
+    return "Successfully executed command."
 
 
 if __name__ == "__main__" :

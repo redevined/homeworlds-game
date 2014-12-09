@@ -4,9 +4,6 @@ import os
 import hashlib
 import cPickle as serializer
 
-# Dictionary of temporary session IDs and according users
-SESSIONS = dict()
-
 
 # User Class
 class User() :
@@ -32,33 +29,10 @@ def hash(msg) :
     sha = hashlib.sha1(msg)
     return sha.hexdigest()
 
-# Returns a list of all existing users (for admin interface)
-def getAllUsers() :
-    users = []
-    for path in os.listdir("users") :
-        with open(os.path.join("users", path), "r") as f :
-            users.append(serializer.load(f))
-    return users
-
-# Logs user in and returns his temporary session ID
-def addSession(user) :
-    usid = len(SESSIONS) + 100
-    SESSIONS[usid] = user
-    return usid
-
-# Function to log user out
-def removeSession(usid) :
-    del(SESSIONS[usid])
-
-# Returns a list of all temp session IDs and users
-def getAllSessions() :
-    return SESSIONS.items()
 
 # Get a logged in user by his temp session ID
-def getBySession(usid) :
-    if SESSIONS.has_key(usid) :
-        return SESSIONS[usid]
-    return None
+def getBySession(code) :
+    return serializer.loads(code)
 
 # Loads a user, logs him in and returns his temp session ID
 def getByLogin(credentials) :
@@ -68,7 +42,7 @@ def getByLogin(credentials) :
         with open(path, "r") as f :
             user = serializer.load(f)
         if user.checkPassword(credentials["password"]) :
-            return addSession(user)
+            return serializer.dumps(user)
     return None
 
 # Creates a new user + same as above function
@@ -80,5 +54,14 @@ def getByRegister(credentials) :
         user = User(un, pw, None if nomail else mail)
         with open(path, "w") as f :
             serializer.dump(user, f)
-        return addSession(user)
+        return serializer.dumps(user)
     return None
+
+
+# Returns a list of all existing users (for admin interface)
+def getAllUsers() :
+    users = []
+    for path in os.listdir("users") :
+        with open(os.path.join("users", path), "r") as f :
+            users.append(serializer.load(f))
+    return users
