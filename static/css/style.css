@@ -86,6 +86,33 @@ div.flash {
 
 
 
+/* Navigation panel */
+div.navigation {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+div.navigation > div {
+    background-color: #488cad;
+    display: table;
+    margin: 0 auto;
+    padding: 5px 10px;
+    border: 2px solid #45758C;
+    border-radius: 0 0 10px 10px;
+}
+
+div.navigation > div > p {
+    margin: 0;
+}
+
+div.navigation > div > p:last-child {
+    text-align: center;
+}
+
+
+
 /* Class for main horizontally and vertically centered main div */
 div.content {
     position: absolute;
@@ -102,6 +129,7 @@ div.content {
 div#home {
     width: 750px;
     height: 750px;
+    overflow: hidden;
 }
 
 /* Div for centering underlying divs */

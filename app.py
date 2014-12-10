@@ -14,7 +14,7 @@ def home() :
 
 @app.route("/play")
 def play() :
-    if not session.has_key("user") :
+    if not session.get("user") :
         return redirect("/login")
     return render_template("portal.html")
 
@@ -30,7 +30,7 @@ def login() :
 
 @app.route("/logout")
 def logout() :
-    if session.has_key("user") :
+    if session.get("user") :
         del session["user"]
         flash("You have been logged out succesfully.")
     return redirect("/login")
@@ -47,7 +47,7 @@ def register() :
 
 @app.route("/admin")
 def admin() :
-    if session.has_key("user") :
+    if session.get("user") :
         if user.getBySession(session["user"]).isAdmin() :
             return render_template(
                 "admin.html",

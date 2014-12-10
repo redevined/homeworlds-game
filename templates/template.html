@@ -8,6 +8,19 @@
         <link href="{{ url_for('static', filename='css/style.css') }}" type="text/css" rel="stylesheet">
     </head>
     <body>
+        <div class="navigation">
+            <div>
+                <p><a href="/">Home</a></p>
+                <p><a href="/play">Play</a></p>
+                {% if not session.get("user") %}
+                    <p><a href="/login">Login</a></p>
+                {% else %}
+                    <p><a href="/logout">Logout</a></p>
+                {% endif %}
+                <p><a href="/admin">Admin</a></p>
+                <p>v</p>
+            </div>
+        </div>
         <div class="content" id="{% block style %}{% endblock %}">
             {% block content %}
             {% endblock %}
