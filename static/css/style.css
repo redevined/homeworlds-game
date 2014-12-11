@@ -89,26 +89,40 @@ div.flash {
 /* Navigation panel */
 div.navigation {
     width: 100%;
+
     position: fixed;
     top: 0;
     left: 0;
+    z-index: 1;
 }
 
 div.navigation > div {
     background-color: #488cad;
     display: table;
+
+    position: relative;
+    top: -125px;
     margin: 0 auto;
-    padding: 5px 10px;
+
     border: 2px solid #45758C;
     border-radius: 0 0 10px 10px;
 }
 
+div.navigation > div:hover {
+    top: -2px;
+}
+
 div.navigation > div > p {
     margin: 0;
+    padding: 3px 10px;
+    border-bottom: 1px solid #45758C;
 }
 
 div.navigation > div > p:last-child {
     text-align: center;
+    font-weight: bold;
+    padding: 0;
+    border-bottom: 0;
 }
 
 
@@ -136,6 +150,7 @@ div#home {
 div#home > div {
     width: 750px;
     height: 250px;
+
     position: absolute;
     top: 0;
     bottom: 0;
@@ -146,6 +161,7 @@ div#home > div {
 div#home > div > div {
     height: 250px;
     width: 250px;
+
     display: table-cell;
     vertical-align: middle;
     text-align: center;
@@ -153,14 +169,14 @@ div#home > div > div {
 }
 
 /* Circle around the large "Play!" button */
-div#home > div > div.main {
+div#home > div > div:nth-child(2) {
     font-size: 52px;
     background-color: #737373;
     border-radius: 50%;
 }
 
 /* Color of "Play!" button */
-div.main > a.button:hover {
+div#home > div > div:nth-child(2) > a.button:hover {
     color: #488cad;
     background-color: #ffffff;
 }
