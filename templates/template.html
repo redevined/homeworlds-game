@@ -16,8 +16,10 @@
                     <p><a href="/login">Login</a></p>
                 {% else %}
                     <p><a href="/logout">Logout</a></p>
+                    {% if getUser(session.get("user")).isAdmin() %}
+                        <p><a href="/admin">Admin</a></p>
+                    {% endif %}
                 {% endif %}
-                <p><a href="/admin">Admin</a></p>
                 <p>&#x25BE;</p>
             </div>
         </div>

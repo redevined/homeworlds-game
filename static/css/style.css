@@ -81,12 +81,15 @@ a.button:hover {
 
 /* Flash message boxes */
 div.flash {
-
+    font-style: italic;
+    background-color: #e2ff25;
+    padding: 10px 10px;
+    border: 5px solid #737373;
 }
 
 
 
-/* Navigation panel */
+/* Navigation header */
 div.navigation {
     width: 100%;
 
@@ -96,33 +99,43 @@ div.navigation {
     z-index: 1;
 }
 
+/* Panel with hyperlinks */
 div.navigation > div {
     background-color: #488cad;
     display: table;
 
     position: relative;
-    top: -125px;
+    top: -94px;
     margin: 0 auto;
 
     border: 2px solid #45758C;
     border-radius: 0 0 10px 10px;
 }
 
+/* Shows panel on hover */
 div.navigation > div:hover {
     top: -2px;
 }
 
+/* Style of lines on the navigation panel */
 div.navigation > div > p {
+    color: #ffffff;
     margin: 0;
     padding: 3px 10px;
     border-bottom: 1px solid #45758C;
 }
 
+/* Dropdown arrow style */
 div.navigation > div > p:last-child {
     text-align: center;
     font-weight: bold;
     padding: 0;
     border-bottom: 0;
+}
+
+/* Makes hyperlinks on the panel not change their color */
+div.navigation a:hover {
+    color: inherit;
 }
 
 
@@ -193,4 +206,9 @@ div#login, div#register {
 div#portal, div#rules, div#about, div#admin {
     width: 600px;
     height: 100%;
+}
+
+/* Style of the error page(s) */
+div#error {
+
 }

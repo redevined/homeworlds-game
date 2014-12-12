@@ -6,6 +6,7 @@ import user
 
 app = Flask(__name__)
 app.secret_key = os.urandom(32)
+app.jinja_env.globals.update(getUser = user.getBySession)
 
 
 @app.route("/")
@@ -64,9 +65,19 @@ def rules() :
 def about() :
     return render_template("about.html")
 
-@app.route("/debug")
+@app.route("/hobbits")
 def debug() :
-    return "Successfully executed command."
+    for ses in session :
+        print session
+    return "<h2>They're taking the hobbits to Isengard!</h2>"
+
+
+@app.errorhandler(404)
+@app.errorhandler(403)
+@app.errorhandler(500)
+def exception(error) :
+    code = error.code
+    return render_template("error.html", code = code), code
 
 
 if __name__ == "__main__" :

@@ -1,0 +1,14 @@
+{% extends "template.html" %}
+{% block style %}error{% endblock %}
+
+{% block content %}
+    <h1>Error {{ code }} :(</h1>
+    {% if code == 404 %}
+        <p>This page does not exist. Try another one.</p>
+    {% elif code == 403 %}
+        <p>I'm sorry, but you do not have access to this page.</p>
+    {% elif code == 500 %}
+        <p>Something went terribly wrong here.</p>
+    {% endif %}
+    <p>You can go back to the <a href="/">starting page</a>.</p>
+{% endblock %}
