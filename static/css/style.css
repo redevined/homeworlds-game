@@ -7,11 +7,12 @@
         XXL Button: 52px
 
     Colors:
-        Background: #f5f5f5
-        Font: #3e3e3e
-        Font(Button): #ffffff
-        Button: #737373
-        Hover: #488cad
+        Black: #3e3e3e
+        Grey: #737373
+        Dark Blue: #45758C
+        Blue: #488cad
+        Yellow: #e2ff25
+        White: #f5f5f5
 */
 
 /* General style */
@@ -20,6 +21,15 @@ html {
     font-size: 18px;
     color: #3e3e3e;
     background-color: #f5f5f5;
+}
+
+
+h1 {
+    color: #45758C;
+}
+
+h2 {
+    color: #488cad;
 }
 
 
@@ -38,7 +48,7 @@ a:hover {
 
 /* Class for links that look like buttons */
 a.button {
-    color: #ffffff;
+    color: #f5f5f5;
     background-color: #737373;
     padding: 10px 20px;
     border-radius: 10%;
@@ -46,7 +56,7 @@ a.button {
 
 /* Fake buttons hover */
 a.button:hover {
-    color: #ffffff;
+    color: #f5f5f5;
     background-color: #488cad;
 }
 
@@ -74,7 +84,7 @@ a.button:hover {
 
 /* Extra Styles for table header */
 .table > div.header > span {
-    color: #ffffff;
+    color: #f5f5f5;
     background-color: #488cad;
     padding: 5px 10px;
 }
@@ -119,7 +129,7 @@ div.navigation > div:hover {
 
 /* Style of lines on the navigation panel */
 div.navigation > div > p {
-    color: #ffffff;
+    color: #f5f5f5;
     margin: 0;
     padding: 3px 10px;
     border-bottom: 1px solid #45758C;
@@ -191,7 +201,7 @@ div#home > div > div:nth-child(2) {
 /* Color of "Play!" button */
 div#home > div > div:nth-child(2) > a.button:hover {
     color: #488cad;
-    background-color: #ffffff;
+    background-color: #f5f5f5;
 }
 
 
