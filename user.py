@@ -6,7 +6,7 @@ import cPickle as serializer
 
 
 # User Class
-class User() :
+class User(object) :
 
     # Constructor
     def __init__(self, un, pw, mail) :
@@ -65,3 +65,14 @@ def getAllUsers() :
         with open(os.path.join("users", path), "r") as f :
             users.append(serializer.load(f))
     return users
+
+
+# Highly experimental user wrapper
+def createUser(cls) :
+    class Wrapper(object) :
+        content = cls()
+        def __getattribute__(self, key) :
+            Wrapper.content.touch()
+            return Wrapper.content.__getattribute__(key)
+
+    return Wrapper
