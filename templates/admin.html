@@ -3,13 +3,12 @@
 
 {% block content %}
     <h1>Admin Interface</h1>
-    <h2>All Users</h2>
+    <h2>Current Users (Sessions)</h2>
     <div class="table">
         <div class="header">
-            <span>Username</span>
-            <span>Password</span>
-            <span>E-Mail</span>
-            <span>User Role</span>
+            <span>SID</span>
+            <span>User</span>
+            <span>Role</span>
         </div>
         {% for user in users %}
             <div>
@@ -17,6 +16,25 @@
                 <span>{{ user.password }}</span>
                 <span>{{ user.email }}</span>
                 <span>{{ user.role }}</span>
+            </div>
+        {% endfor %}
+    </div>
+    <h2>All Users</h2>
+    <div class="table">
+        <div class="header">
+            <span>Username</span>
+            <span>Password</span>
+            <span>E-Mail</span>
+            <span>Role</span>
+            <span>Last online</span>
+        </div>
+        {% for user in users %}
+            <div>
+                <span>{{ user.username }}</span>
+                <span>{{ user.password }}</span>
+                <span>{{ user.email }}</span>
+                <span>{{ user.role }}</span>
+                <span>{{ user.getLastSeen(pretty = True) }}</span>
             </div>
         {% endfor %}
     </div>
