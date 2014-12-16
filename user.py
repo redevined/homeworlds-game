@@ -3,6 +3,7 @@
 import os, time
 import hashlib
 import cPickle as serializer
+from flask import session as cookie
 from session import UserSessions
 
 # Object containing all user sessions
@@ -41,8 +42,11 @@ class User() :
         return self.password == self._hash(pw)
 
     # Checks for admin rights
-    def isAdmin(self) :
+    def isAdmin(self, elevate = None) :
+        if elevate is not None :
+            self.role = "ADMIN" if elevate else "USER"
         return self.role == "ADMIN"
+
 
     # Returns timestamp as strtuct_time object or a pretty string
     def getLastSeen(self, pretty = False) :
@@ -64,7 +68,7 @@ class User() :
 def _save(user) :
     path = os.path.join("users", user.username + ".p")
     with open(path, "w") as f :
-        serializer.dump(f, user)
+        serializer.dump(user, f)
 
 # Loads a serialized user and returns him
 def _load(name) :
@@ -79,7 +83,8 @@ def _load(name) :
 # Get a logged in user by his session ID
 def getBySession(sid) :
     user = session.get(sid)
-    user.touch()
+    if user :
+        user.touch()
     return user
 
 # Removes user from sessions
@@ -103,6 +108,14 @@ def getByRegister(credentials) :
 
 
 
+# Returns an user by his username (for admin interface)
+def getByName(name) :
+    return _load(name)
+
+# Deletes an user (for admin interface)
+def deleteByName(name) :
+    os.remove(os.path.join("users", name + ".p"))
+
 # Returns a list of all existing users (for admin interface)
 def getAllUsers() :
     users = []
@@ -114,3 +127,26 @@ def getAllUsers() :
 # Returns a dictionary of logged in users, along with their session IDs (for admin interface)
 def getCurrentUsers() :
     return session.getAll()
+
+
+
+# Decorator to check if user is logged in
+def auth(action) :
+    def decorator(*args) :
+        user = getBySession(cookie.get("user"))
+        if user :
+            action(*args)
+        return redirect("/login")
+    decorator.__name__ == action.__name__
+    return decorator
+
+# Check if user is logged in and has admin rights
+def authAdmin(action) :
+    def decorator(*args) :
+        user = getBySession(cookie.get("user"))
+        if user :
+            if user.isAdmin() :
+                action(*args)
+        return redirect("/login")
+    decorator.__name__ == action.__name__
+    return decorator

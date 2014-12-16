@@ -213,12 +213,24 @@ div#login, div#register {
 }
 
 /* Div ids for rules.html and about.html */
-div#portal, div#rules, div#about, div#admin {
+div#portal, div#rules, div#about {
     width: 600px;
+    height: 100%;
+}
+
+/* Div id for admin interface */
+div#admin {
+    width: 800px;
     height: 100%;
 }
 
 /* Style of the error page(s) */
 div#error {
+    width: 600px;
+    height: 200px;
+}
 
+/* Left indent on error page(s) */
+div#error > p {
+    padding-left: 50px;
 }

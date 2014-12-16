@@ -9,13 +9,16 @@
             <span>SID</span>
             <span>User</span>
             <span>Role</span>
+            <span>Functions</span>
         </div>
-        {% for user in users %}
+        {% for sid, user in sessions %}
             <div>
+                <span>{{ sid }}</span>
                 <span>{{ user.username }}</span>
-                <span>{{ user.password }}</span>
-                <span>{{ user.email }}</span>
                 <span>{{ user.role }}</span>
+                <span>
+                    <a href="/admin/terminate/{{ sid }}" class="button">Terminate</a>
+                </span>
             </div>
         {% endfor %}
     </div>
@@ -27,6 +30,7 @@
             <span>E-Mail</span>
             <span>Role</span>
             <span>Last online</span>
+            <span>Functions</span>
         </div>
         {% for user in users %}
             <div>
@@ -35,6 +39,14 @@
                 <span>{{ user.email }}</span>
                 <span>{{ user.role }}</span>
                 <span>{{ user.getLastSeen(pretty = True) }}</span>
+                <span>
+                    {% if user.role == "USER" %}
+                        <a href="/admin/elevate/{{ user.username }}" class="button">Elevate</a>
+                    {% else %}
+                        <a href="/admin/lower/{{ user.username }}" class="button">Lower</a>
+                    {% endif %}
+                    <a href="/admin/delete/{{ user.username }}" class="button">Delete</a>
+                </span>
             </div>
         {% endfor %}
     </div>

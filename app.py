@@ -70,6 +70,23 @@ def admin() :
             )
     return redirect("/login")
 
+# Admin functions
+@app.route("/admin/<function>/<param>")
+def adminFunctions(function, param) :
+    if session.get("user") :
+        user = user.getBySession(session.get("user"))
+        if user.getBySession(session["user"]).isAdmin() :
+            if function == "terminate":
+                user.removeSession(int(param))
+            elif function == "elevate" :
+                user.getByName(param).isAdmin(True)
+            elif function == "lower" :
+                user.getByName(param).isAdmin(False)
+            elif function == "delete" :
+                user.deleteByName(param)
+            return redirect("/admin")
+    return redirect("/login")
+
 # Rules page
 @app.route("/rules")
 def rules() :

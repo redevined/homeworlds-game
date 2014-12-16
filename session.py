@@ -50,7 +50,7 @@ class UserSessions() :
         return sid
 
     # Deletes user from container
-    def remove(sid) :
+    def remove(self, sid) :
         del(self.users[sid])
 
     # Returns number of current sessions
