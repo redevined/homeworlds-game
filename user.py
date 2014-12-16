@@ -3,7 +3,8 @@
 import os, time
 import hashlib
 import cPickle as serializer
-from flask import session as cookie
+from flask import redirect, session as cookie
+# Server side session management class
 from session import UserSessions
 
 # Object containing all user sessions
@@ -132,21 +133,21 @@ def getCurrentUsers() :
 
 # Decorator to check if user is logged in
 def auth(action) :
-    def decorator(*args) :
+    def decorator(*args, **kwargs) :
         user = getBySession(cookie.get("user"))
         if user :
-            action(*args)
+            return action(*args, **kwargs)
         return redirect("/login")
-    decorator.__name__ == action.__name__
+    decorator.__name__ = action.__name__
     return decorator
 
 # Check if user is logged in and has admin rights
 def authAdmin(action) :
-    def decorator(*args) :
+    def decorator(*args, **kwargs) :
         user = getBySession(cookie.get("user"))
         if user :
             if user.isAdmin() :
-                action(*args)
+                return action(*args, **kwargs)
         return redirect("/login")
-    decorator.__name__ == action.__name__
+    decorator.__name__ = action.__name__
     return decorator

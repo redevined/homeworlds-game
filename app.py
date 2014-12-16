@@ -2,6 +2,7 @@
 
 import os
 from flask import *
+# User management and authentication decorators
 import user
 
 # Create app
@@ -20,11 +21,10 @@ app.jinja_env.globals.update(
 def home() :
     return render_template("home.html")
 
-# Entry pages for games if loggeed in, else redirects to login
+# Entry page for games if logged in, else redirects to login
 @app.route("/play")
+@user.auth
 def play() :
-    if not session.get("user") :
-        return redirect("/login")
     return render_template("portal.html")
 
 # Action for login page
@@ -51,41 +51,36 @@ def register() :
 
 # Removes session
 @app.route("/logout")
+@user.auth
 def logout() :
-    if session.get("user") :
-        user.removeSession(session.pop("user"))
-        flash("You have been logged out succesfully.")
+    user.removeSession(session.pop("user"))
+    flash("You have been logged out succesfully.")
     return redirect("/login")
 
 # Admin interface
 @app.route("/admin")
+@user.authAdmin
 def admin() :
-    if session.get("user") :
-        if user.getBySession(session["user"]).isAdmin() :
-            return render_template(
-                "admin.html",
-                sessions = user.getCurrentUsers(),
-                users = user.getAllUsers(),
-                games = []
-            )
-    return redirect("/login")
+    return render_template(
+        "admin.html",
+        sessions = user.getCurrentUsers(),
+        users = user.getAllUsers(),
+        games = []
+    )
 
 # Admin functions
 @app.route("/admin/<function>/<param>")
+@user.authAdmin
 def adminFunctions(function, param) :
-    if session.get("user") :
-        user = user.getBySession(session.get("user"))
-        if user.getBySession(session["user"]).isAdmin() :
-            if function == "terminate":
-                user.removeSession(int(param))
-            elif function == "elevate" :
-                user.getByName(param).isAdmin(True)
-            elif function == "lower" :
-                user.getByName(param).isAdmin(False)
-            elif function == "delete" :
-                user.deleteByName(param)
-            return redirect("/admin")
-    return redirect("/login")
+    if function == "terminate":
+        user.removeSession(int(param))
+    elif function == "elevate" :
+        user.getByName(param).isAdmin(True)
+    elif function == "lower" :
+        user.getByName(param).isAdmin(False)
+    elif function == "delete" :
+        user.deleteByName(param)
+    return redirect("/admin")
 
 # Rules page
 @app.route("/rules")
