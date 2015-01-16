@@ -2,9 +2,10 @@
 
 class Game() :
 
-    def __init__(self, player1, player2) :
-        self.players = [player1, player2]
-        self.active = 0
+    def __init__(self, *players) :
+        self.players = players
+        self.active = players[0]
+        self.otherPlayer = lambda p : players[players.index(p)-1]
         self.universe = Universe()
         self.aproc = ActionProcessor(self)
 
@@ -20,12 +21,12 @@ class Game() :
         # Pass: "player pass"
 
         proc = pstr.split()
-        player = self.players.index(proc[0])
+        player = proc[0]
         sys = proc[1]
         action = proc[2]
 
         if action == "s" :
-            n = aproc.sacrifice(player, sys, proc[3])
+            aproc.sacrifice(player, sys, proc[3])
             procs = [[player] + f.split() for f in " ".join(proc[4:]).split(player)][1:]
             for proc in procs :
                 self.parse(" ".join(proc))
@@ -43,7 +44,7 @@ class Game() :
                 "c" : aproc.cataclysm
             }[action](player, sys, *proc[3:])
 
-        self.active = (player + 1) % 2
+        self.active = self.otherPlayer(player)
 
 
 class ActionProcessor() :
@@ -52,30 +53,47 @@ class ActionProcessor() :
         self.game = inst
 
     def attack(self, player, sys, target) :
-        pass
+        system = self.game.universe.getSystem(sys)
+        ship = system.take(self.game.otherPlayer(player), target)
+        system.add(player, ship)
 
     def build(self, player, sys, color) :
-        pass
+        system = self.game.universe.getSystem(sys)
+        system.addShip(player, color)
 
     def trade(self, player, sys, target, color) :
-        pass
+        system = self.game.universe.getSystem(sys)
+        ship = system.take(player, target)
+        stash.add(ship)
+        ship = self.game.stash.take("ship", color, ship.size)
+        system.add(player, ship)
 
     def move(self, player, sys, target, nsys) :
-        pass
+        system = self.game.universe.getSystem(sys)
+        ship = system.take(player, target)
+        system = self.game.universe.getSystem(nsys)
+        system.add(player, ship)
 
     def discover(self, player, sys, target, color, size) :
-        pass
+        system = self.game.universe.getSystem(sys)
+        ship = system.take(player, target)
+        system = self.game.universe.newSystem(color, size)
+        system.add(player, ship)
 
     def sacrifice(self, player, sys, target) :
-        pass
+        system = self.game.universe.getSystem(sys)
+        ship = system.take(player, target)
+        stash.add(ship)
 
     def cataclysm(self, player, sys) :
-        pass
+        system = self.game.universe.getSystem(sys)
+
 
 
 class Universe() :
 
-    def __init__(self) :
+    def __init__(self, inst) :
+        self.game = inst
         self.systems = list()
         self.stash = Stash()
 
@@ -85,15 +103,25 @@ class Universe() :
 
 class System() :
 
-    def __init__(self, stars, home) :
-        self.star = stars
-        self.area1 = []
-        self.area2 = []
+    def __init__(self, inst, stars, home) :
+        self.universe = inst
+        self.areas = {"star": stars, inst.game.players[0]: [], inst.game.players[1]: []}
         self.home = home
 
     def __del__(self) :
         if self.home is not None :
             pass
+
+    def newShip(self, player, color, size = None) :
+        ship = self.universe.stash.take(color, size)
+        self.areas[player].append(ship)
+
+    def addShip(self, player, ship) :
+        self.areas[player].append(ship)
+
+    def takeShip(self, player, shipstr) :
+        ship = self.areas[player].pop([str(s) for f in self.areas[player]].index(shipstr))
+        return ship
 
 
 class Stash() :
