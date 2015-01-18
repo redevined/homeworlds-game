@@ -6,13 +6,13 @@ class Game() :
         self.players = players
         self.active = players[0]
         self.otherPlayer = lambda p : players[players.index(p)-1]
-        self.universe = Universe()
+        self.universe = Universe(self)
         self.aproc = ActionProcessor(self)
 
     def parse(self, pstr) :
         # Parsing strings
         # Attack: "player system red target"
-        # Build: "player system green color"
+        # Build: "player system green target"
         # Trade: "player system blue target color"
         # Move: "player system yellow target system"
         # Discover (Move): "player system yellow target color size"
@@ -21,9 +21,7 @@ class Game() :
         # Pass: "player pass"
 
         proc = pstr.split()
-        player = proc[0]
-        sys = proc[1]
-        action = proc[2]
+        player, s, action = proc[0:3]
 
         if action == "s" :
             aproc.sacrifice(player, sys, proc[3])
@@ -54,95 +52,119 @@ class ActionProcessor() :
 
     def attack(self, player, sys, target) :
         system = self.game.universe.getSystem(sys)
-        ship = system.take(self.game.otherPlayer(player), target)
+        ship = system.get(self.game.otherPlayer(player), target[1], target[0])
         system.add(player, ship)
 
-    def build(self, player, sys, color) :
+    def build(self, player, sys, target) :
         system = self.game.universe.getSystem(sys)
-        system.addShip(player, color)
+        system.new(player, target[1], target[0])
 
     def trade(self, player, sys, target, color) :
         system = self.game.universe.getSystem(sys)
-        ship = system.take(player, target)
-        stash.add(ship)
-        ship = self.game.stash.take("ship", color, ship.size)
-        system.add(player, ship)
+        system.remove(player, target[1], target[0])
+        system.new(player, target[1], color)
 
     def move(self, player, sys, target, nsys) :
         system = self.game.universe.getSystem(sys)
-        ship = system.take(player, target)
+        ship = system.get(player, target[1], target[0])
         system = self.game.universe.getSystem(nsys)
         system.add(player, ship)
 
     def discover(self, player, sys, target, color, size) :
         system = self.game.universe.getSystem(sys)
-        ship = system.take(player, target)
-        system = self.game.universe.newSystem(color, size)
+        ship = system.get(player, target[1], target[0])
+        system = self.game.universe.newSystem((color, size))
         system.add(player, ship)
 
     def sacrifice(self, player, sys, target) :
         system = self.game.universe.getSystem(sys)
-        ship = system.take(player, target)
-        stash.add(ship)
+        system.remove(player, target[1], target[0])
 
     def cataclysm(self, player, sys) :
         system = self.game.universe.getSystem(sys)
 
+        def catagen(*elements) :
+            elements = [e.color for es in elements for e in es]
+            for c in ("r", "g", "b", "y") :
+                if elements.count(c) >= 4 :
+                    yield c
+
+        for c in catagen(system.areas.values()) :
+            for p, a in system.areas :
+                for e in a :
+                    if e.color == c :
+                        system.remove(p, e.color, e.size)
+
+        if not system.areas["star"] :
+            self.game.universe.removeSystem(sys)
 
 
 class Universe() :
 
     def __init__(self, inst) :
         self.game = inst
-        self.systems = list()
+        self.systems = dict()
         self.stash = Stash()
 
-    def addSystem(self, *stars, home = None) :
-        self.systems.append(System(stars, home))
+    def newSystem(self, *stars, home = None) :
+        sysid = max(self.systems.keys()) + 1 if len(self.systems) > 0 else 100
+        self.systems[sysid] = System(self, stars)
+
+    def getSystem(self, sysid) :
+        return self.systems[sysid]
+
+    def removeSystem(self, sysid) :
+        del(self.systems[sysid])
 
 
 class System() :
 
-    def __init__(self, inst, stars, home) :
+    def __init__(self, inst, stars) :
         self.universe = inst
-        self.areas = {"star": stars, inst.game.players[0]: [], inst.game.players[1]: []}
-        self.home = home
+        self.areas = {"star": [], inst.game.players[0]: [], inst.game.players[1]: []}
+        for star in stars :
+            self.new("star", *star)
 
     def __del__(self) :
-        if self.home is not None :
-            pass
+        for p, a in self.areas :
+            for e in a :
+                self.remove(p, e.color, e.size)
 
-    def newShip(self, player, color, size = None) :
-        ship = self.universe.stash.take(color, size)
-        self.areas[player].append(ship)
+    def new(self, player, color, size) :
+        element = self.universe.stash.get(color, size)
+        self.add(player, element)
 
-    def addShip(self, player, ship) :
-        self.areas[player].append(ship)
+    def add(self, player, element) :
+        self.areas[player].append(element)
 
-    def takeShip(self, player, shipstr) :
-        ship = self.areas[player].pop([str(s) for f in self.areas[player]].index(shipstr))
-        return ship
+    def get(self, player, color, size) :
+        element = self.areas[player].pop([str(e) for e in self.areas[player]].index(size + color))
+        return element
+
+    def remove(self, player, color, size) :
+        element = self.get(player, color, size)
+        self.universe.stash.add(element)
 
 
 class Stash() :
 
     def __init__(self, size = 5) :
-        self.stacks = { c : { s : [Element(c, s) for i in range(size)] for s in (1, 2, 3) } for c in ("r", "g", "b", "y") }
+        self.stacks = { c : {
+            s : [Element(c, s) for i in range(size)] for s in (1, 2, 3)
+        } for c in ("r", "g", "b", "y") }
+
+    def add(self, element) :
+        self.stacks[element.color][element.size].append(element)
+
+    def get(self, color, size) :
+        return self.stacks[color][size].pop()
 
 
 class Element() :
 
     def __init__(self, color, size) :
-        self.type = None
         self.color = color
         self.size = size
 
-    def isShip(self, enable = False) :
-        if enable :
-            self.type = "ship"
-        return self.type == "ship"
-
-    def isStar(self, enable = False) :
-        if enable :
-            self.type = "star"
-        return self.type == "star"
+    def __str__(self) :
+        return str(self.size) + self.color
