@@ -3,11 +3,20 @@
 class Game() :
 
     def __init__(self, *players) :
+        self.run = False
         self.players = players
         self.active = players[0]
+        self.homes = dict()
         self.otherPlayer = lambda p : players[players.index(p)-1]
         self.universe = Universe(self)
         self.aproc = ActionProcessor(self)
+
+    def register(self, player, star1, star2, ship) :
+        homeid = self.universe.newSystem(star1, star2)
+        self.universe.getSystem(homeid).new(player, ship[1], ship[0])
+        self.homes[player] = homeid
+        if len(self.homes) > 1 :
+            self.run = True
 
     def parse(self, pstr) :
         # Parsing strings
@@ -21,26 +30,45 @@ class Game() :
         # Pass: "player pass"
 
         proc = pstr.split()
-        player, s, action = proc[0:3]
+        player, sys, action = proc[0:3]
 
         if action == "s" :
-            aproc.sacrifice(player, sys, proc[3])
+            self.aproc.sacrifice(player, sys, proc[3])
             procs = [[player] + f.split() for f in " ".join(proc[4:]).split(player)][1:]
             for proc in procs :
                 self.parse(" ".join(proc))
 
         elif action == "y" and len(proc) > 5 :
-            aproc.discover(player, sys, *proc[3:])
+            self.aproc.discover(player, sys, *proc[3:])
         elif action == "p" :
             pass
         else :
             {
-                "r" : aproc.attack,
-                "g" : aproc.build,
-                "b" : aproc.trade,
-                "y" : aproc.move,
-                "c" : aproc.cataclysm
-            }[action](player, sys, *proc[3:])
+                "r" : self.aproc.attack,
+                "g" : self.aproc.build,
+                "b" : self.aproc.trade,
+                "y" : self.aproc.move,
+                "c" : self.aproc.cataclysm
+            }[action](player, int(sys), *proc[3:])
+
+        self.finish(player)
+
+    def finish(self, player) :
+        wins = dict()
+        for pl, homeid in self.homes.items() :
+            try :
+                if not self.universe.getSystem(homeid).areas[pl] :
+                    wins[self.otherPlayer(pl)] = True
+            except KeyError :
+                wins[self.otherPlayer(pl)] = True
+
+        if wins :
+            if wins.values() == [True, True] :
+                print "Draw."
+            else :
+                for pl, win in wins.items() :
+                    if win :
+                        print pl, "won the game!"
 
         self.active = self.otherPlayer(player)
 
@@ -82,7 +110,6 @@ class ActionProcessor() :
 
     def cataclysm(self, player, sys) :
         system = self.game.universe.getSystem(sys)
-
         def catagen(*elements) :
             elements = [e.color for es in elements for e in es]
             for c in ("r", "g", "b", "y") :
@@ -90,6 +117,7 @@ class ActionProcessor() :
                     yield c
 
         for c in catagen(system.areas.values()) :
+            # probably not working !!!
             for p, a in system.areas :
                 for e in a :
                     if e.color == c :
@@ -106,9 +134,11 @@ class Universe() :
         self.systems = dict()
         self.stash = Stash()
 
-    def newSystem(self, *stars, home = None) :
+    def newSystem(self, *stars) :
+        sys = System(self, stars)
         sysid = max(self.systems.keys()) + 1 if len(self.systems) > 0 else 100
-        self.systems[sysid] = System(self, stars)
+        self.systems[sysid] = sys
+        return sysid
 
     def getSystem(self, sysid) :
         return self.systems[sysid]
@@ -123,7 +153,7 @@ class System() :
         self.universe = inst
         self.areas = {"star": [], inst.game.players[0]: [], inst.game.players[1]: []}
         for star in stars :
-            self.new("star", *star)
+            self.new("star", star[1], star[0])
 
     def __del__(self) :
         for p, a in self.areas :
@@ -150,7 +180,7 @@ class Stash() :
 
     def __init__(self, size = 5) :
         self.stacks = { c : {
-            s : [Element(c, s) for i in range(size)] for s in (1, 2, 3)
+            s : [Element(c, s) for i in range(size)] for s in ("1", "2", "3")
         } for c in ("r", "g", "b", "y") }
 
     def add(self, element) :
