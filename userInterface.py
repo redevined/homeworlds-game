@@ -1,19 +1,18 @@
 #!/usr/bin/env python
 
-import os, time
-import hashlib
+import os, hashlib
 import cPickle as serializer
 from flask import redirect, session as cookie
-# Server side session management class
-from session import UserSessions
 
-# Object containing all user sessions
-session = UserSessions()
+# Server side session management classes
+from session import SessionItem, SessionContainer
 
+# Object containing all active user sessions
+session = SessionContainer()
 
 
 # User Class
-class User() :
+class User(SessionItem) :
 
     # Constructor
     def __init__(self, un, pw, mail, role = "USER") :
@@ -21,6 +20,7 @@ class User() :
         self.password = self._hash(pw)
         self.email = mail
         self.role = role
+        self.games = []
 
         self.touch()
         _save(self)
@@ -34,10 +34,6 @@ class User() :
         sha = hashlib.sha1(msg)
         return sha.hexdigest()
 
-    # Updates the timestamp to control last user activity
-    def touch(self) :
-        self.timestamp = time.time()
-
     # Compares password hashes
     def checkPassword(self, pw) :
         return self.password == self._hash(pw)
@@ -47,22 +43,6 @@ class User() :
         if elevate is not None :
             self.role = "ADMIN" if elevate else "USER"
         return self.role == "ADMIN"
-
-
-    # Returns timestamp as strtuct_time object or a pretty string
-    def getLastSeen(self, pretty = False) :
-        date = time.localtime(self.timestamp)
-        if pretty :
-            return "{}.{}.{} - {}:{}".format(
-                date.tm_mday,
-                date.tm_mon,
-                date.tm_year,
-                date.tm_hour,
-                date.tm_min
-            )
-        else :
-            return date
-
 
 
 # Saves the modified user
@@ -78,7 +58,6 @@ def _load(name) :
         with open(path, "r") as f :
             return serializer.load(f)
     return None
-
 
 
 # Get a logged in user by his session ID
@@ -107,28 +86,21 @@ def getByRegister(credentials) :
         return session.add(User(un, pw, None if nomail else mail))
     return None
 
-
-
-# Returns an user by his username (for admin interface)
+# Returns an user by his username
 def getByName(name) :
     return _load(name)
 
-# Deletes an user (for admin interface)
+# Deletes an user
 def deleteByName(name) :
     os.remove(os.path.join("users", name + ".p"))
 
-# Returns a list of all existing users (for admin interface)
+# Returns a list of all existing users
 def getAllUsers() :
-    users = []
-    for path in os.listdir("users") :
-        with open(os.path.join("users", path), "r") as f :
-            users.append(serializer.load(f))
-    return users
+    return [_load(path.rsplit(".", 1)[0]) for path in os.listdir("users")]
 
-# Returns a dictionary of logged in users, along with their session IDs (for admin interface)
+# Returns a dictionary of logged in users, along with their session IDs
 def getCurrentUsers() :
     return session.getAll()
-
 
 
 # Decorator to check if user is logged in

@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
-import os
+import os, random
 from flask import *
-# User management and authentication decorators
-import user
+
+# User management and authentication decorators + game control functions
+import userInterface as user
+import gameInterface as game
 
 # Create app
 app = Flask(__name__)
@@ -15,17 +17,38 @@ app.jinja_env.globals.update(
 )
 
 
-
 # Homepage
 @app.route("/")
 def home() :
     return render_template("home.html")
 
-# Entry page for games if logged in, else redirects to login
-@app.route("/play")
+
+# Entry page for games
+@app.route("/play", methods=["GET", "POST"])
 @user.auth
 def play() :
-    return render_template("portal.html")
+    if request.method == "POST" :
+        players = (
+            user.getBySession(session.get("user")),
+            user.getByName(request.form["username"]) if request.form["username"].lowercase() != "random"
+                else random.choice(user.getAllUsers())
+        )
+        if None not in players :
+            return redirect("/play/" + game.newGame(players))
+        else :
+            flash("There is no user with this name.")
+    return render_template("portal.html", games = user.getBySession(session.get("user")).games)
+
+# Continue existing game
+@app.route("/play/<param>", methods=["GET", "POST"])
+@user.auth
+def playGame(param) :
+    gg = game.openGame(param)
+    if request.method == "POST" :
+        gg.parse(request.form["command"])
+        game.saveGame(gg)
+    return game.render(gg, render_template)
+
 
 # Action for login page
 @app.route("/login", methods=["GET", "POST"])
@@ -57,6 +80,7 @@ def logout() :
     flash("You have been logged out succesfully.")
     return redirect("/login")
 
+
 # Admin interface
 @app.route("/admin")
 @user.authAdmin
@@ -65,7 +89,7 @@ def admin() :
         "admin.html",
         sessions = user.getCurrentUsers(),
         users = user.getAllUsers(),
-        games = []
+        games = game.getAllGames()
     )
 
 # Admin functions
@@ -80,7 +104,10 @@ def adminFunctions(function, param) :
         user.getByName(param).isAdmin(False)
     elif function == "delete" :
         user.deleteByName(param)
+    elif function == "stop" :
+        game.finishGame(name)
     return redirect("/admin")
+
 
 # Rules page
 @app.route("/rules")
@@ -93,7 +120,6 @@ def about() :
     return render_template("about.html")
 
 
-
 # Error pages for various http errors
 @app.errorhandler(404)
 @app.errorhandler(403)
@@ -101,7 +127,6 @@ def about() :
 def exception(error) :
     code = error.code
     return render_template("error.html", code = code), code
-
 
 
 # Run app if main

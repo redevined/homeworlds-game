@@ -52,10 +52,25 @@
     </div>
     <h2>All Games</h2>
     <div class="table">
+        <div class="header">
+            <span>Player 1</span>
+            <span>Player 2</span>
+            <span>Turn of</span>
+            <span>Winner</span>
+            <span>No. of systems</span>
+            <span>Functions</span>
+        </div>
         {% for game in games %}
-            <div>
-                <span>{{ game }}</span>
-            </div>
+        <div>
+            <span>{{ game.players[0] }}</span>
+            <span>{{ game.players[1] }}</span>
+            <span>{{ game.active }}</span>
+            <span>{{ game.winner }}</span>
+            <span>{{ game.universe.systems.__len__() }}</span>
+            <span>
+                <a href="/admin/stop/{{ game.name }}" class="button">Delete</a>
+            </span>
+        </div>
         {% endfor %}
     </div>
 {% endblock %}

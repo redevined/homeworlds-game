@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
+
 class Game() :
 
-    def __init__(self, *players) :
-        self.run = False
+    def __init__(self, players) :
+        self.name = "{}_vs_{}".format(*players)
         self.players = players
         self.active = players[0]
+        self.winner = None
         self.homes = dict()
         self.otherPlayer = lambda p : players[players.index(p)-1]
         self.universe = Universe(self)
@@ -15,10 +17,8 @@ class Game() :
         homeid = self.universe.newSystem(star1, star2)
         self.universe.getSystem(homeid).new(player, ship[1], ship[0])
         self.homes[player] = homeid
-        if len(self.homes) > 1 :
-            self.run = True
 
-    def parse(self, pstr) :
+    def parse(self, cmd) :
         # Parsing strings
         # Attack: "player system red target"
         # Build: "player system green target"
@@ -29,7 +29,7 @@ class Game() :
         # Cataclysm: "player system cataclysm"
         # Pass: "player pass"
 
-        proc = pstr.split()
+        proc = cmd.split()
         player, sys, action = proc[0:3]
 
         if action == "s" :
@@ -37,7 +37,6 @@ class Game() :
             procs = [[player] + f.split() for f in " ".join(proc[4:]).split(player)][1:]
             for proc in procs :
                 self.parse(" ".join(proc))
-
         elif action == "y" and len(proc) > 5 :
             self.aproc.discover(player, sys, *proc[3:])
         elif action == "p" :
@@ -51,26 +50,18 @@ class Game() :
                 "c" : self.aproc.cataclysm
             }[action](player, int(sys), *proc[3:])
 
-        self.finish(player)
+        self.winner = self.finish(player)
 
     def finish(self, player) :
-        wins = dict()
+        win = list()
         for pl, homeid in self.homes.items() :
             try :
                 if not self.universe.getSystem(homeid).areas[pl] :
-                    wins[self.otherPlayer(pl)] = True
+                    win.append(self.otherPlayer(pl))
             except KeyError :
-                wins[self.otherPlayer(pl)] = True
-
-        if wins :
-            if wins.values() == [True, True] :
-                print "Draw."
-            else :
-                for pl, win in wins.items() :
-                    if win :
-                        print pl, "won the game!"
-
+                win.append(self.otherPlayer(pl))
         self.active = self.otherPlayer(player)
+        return win or None
 
 
 class ActionProcessor() :

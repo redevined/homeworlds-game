@@ -4,13 +4,34 @@ import time
 from threading import Thread
 
 
+# Parent class for session items
+class SessionItem() :
 
-# Container class for user sessions
-class UserSessions() :
+    # Updates the timestamp to control last item activity
+    def touch(self) :
+        self.timestamp = time.time()
+
+    # Returns timestamp as struct_time object or a pretty string
+    def getLastSeen(self, pretty = False) :
+        date = time.localtime(self.timestamp)
+        if pretty :
+            return "{}.{}.{} - {}:{}".format(
+                date.tm_mday,
+                date.tm_mon,
+                date.tm_year,
+                date.tm_hour,
+                date.tm_min
+            )
+        else :
+            return date
+
+
+# Container class for sessions
+class SessionContainer() :
 
     # Constructor
     def __init__(self, timeout = 60*30, interval = 60) :
-        self.users = dict()
+        self.items = dict()
         if timeout :
             self.timeout = timeout
             self.startCleaner(interval)
@@ -32,31 +53,31 @@ class UserSessions() :
     def clean(self, interval) :
         while self.cleaning:
             now = time.time()
-            for sid, user in self.users.items() :
-                if now - user.timestamp > self.timeout :
+            for sid, item in self.items.items() :
+                if now - item.timestamp > self.timeout :
                     self.remove(sid)
             time.sleep(interval)
 
-    # Returns user by his session ID, if not present returns None
+    # Returns item by its session ID, if not present returns None
     def get(self, sid) :
-        if self.users.has_key(sid) :
-            return self.users[sid]
+        if self.items.has_key(sid) :
+            return self.items[sid]
         return None
 
-    # Adds user and returns his session ID
-    def add(self, user) :
-        sid = max(self.users.keys()) + 1 if self.count() > 0 else 100
-        self.users[sid] = user
+    # Adds item and returns its session ID
+    def add(self, item) :
+        sid = max(self.items.keys()) + 1 if self.count() > 0 else 100
+        self.items[sid] = item
         return sid
 
-    # Deletes user from container
+    # Deletes item from container
     def remove(self, sid) :
-        del(self.users[sid])
+        del(self.items[sid])
 
     # Returns number of current sessions
     def count(self) :
-        return len(self.users)
+        return len(self.items)
 
     # Returns all sessions
     def getAll(self) :
-        return self.users.items()
+        return self.items.items()
