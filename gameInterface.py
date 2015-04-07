@@ -29,7 +29,11 @@ def finishGame(name) :
 
 def render(game, template) :
     gameUI = "gameUI.html"
-    return template(gameUI, game = game)
+    return template(gameUI, systems = game.universe, sys_map = createSysMap(game))
 
 def getAllGames() :
     return [openGame(path.rsplit(".", 1)[0]) for path in os.listdir("games")]
+
+
+def createSysMap(game) :
+    pass

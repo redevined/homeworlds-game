@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, hashlib
+import os, hashlib, re
 import cPickle as serializer
 from flask import redirect, session as cookie
 
@@ -82,13 +82,14 @@ def getByLogin(credentials) :
 # Creates a new user + same as above function
 def getByRegister(credentials) :
     un, pw, mail, nomail = credentials["username"], credentials["password"], credentials["email"], credentials.has_key("no_email")
-    if un and pw and (mail or nomail) and not _load(un) :
+    if re.match(r"[\w\s._()]+", un) and pw and (mail or nomail) and not _load(un) :
         return session.add(User(un, pw, None if nomail else mail))
     return None
 
 # Returns an user by his username
 def getByName(name) :
-    return _load(name)
+    user = session.getByAttr(username = name)
+    return user or _load(name)
 
 # Deletes an user
 def deleteByName(name) :
@@ -96,7 +97,8 @@ def deleteByName(name) :
 
 # Returns a list of all existing users
 def getAllUsers() :
-    return [_load(path.rsplit(".", 1)[0]) for path in os.listdir("users")]
+    names = [path.rsplit(".", 1)[0] for path in os.listdir("users")]
+    return [getByName(name) for name in names]
 
 # Returns a dictionary of logged in users, along with their session IDs
 def getCurrentUsers() :

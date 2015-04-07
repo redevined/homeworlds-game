@@ -232,3 +232,31 @@ div#error {
 div#error > p {
     padding-left: 50px;
 }
+
+/* Game UI */
+div#game {
+    width: 1000px;
+    height: 600px;
+    background-color: #ff0000;
+}
+
+div#game div.system {
+    width: 100px;
+    height: 100px;
+
+    position: absolute;
+    top: 0px;
+    left: 0px;
+
+    border: 2px solid black;
+    border-radius: 50%;
+}
+
+div#game div.system > div {
+    float: left;
+    line-height: 100px;
+}
+
+div#game div.system span.ship, span.star {
+    font-weight: bold;
+}

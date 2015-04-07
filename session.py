@@ -78,6 +78,14 @@ class SessionContainer() :
     def count(self) :
         return len(self.items)
 
+    # Returns item by one of its attributes
+    def getByAttr(self, **attrs) :
+        for attr, val in attrs.items() :
+            for item in self.items.values() :
+                if getattr(item, attr) == val :
+                    return item
+        return None
+
     # Returns all sessions
     def getAll(self) :
         return self.items.items()

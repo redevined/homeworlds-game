@@ -54,12 +54,12 @@ class Game() :
 
     def finish(self, player) :
         win = list()
-        for pl, homeid in self.homes.items() :
+        for p, homeid in self.homes.items() :
             try :
-                if not self.universe.getSystem(homeid).areas[pl] :
-                    win.append(self.otherPlayer(pl))
+                if not self.universe.getSystem(homeid).areas[p] :
+                    win.append(self.otherPlayer(p))
             except KeyError :
-                win.append(self.otherPlayer(pl))
+                win.append(self.otherPlayer(p))
         self.active = self.otherPlayer(player)
         return win or None
 
@@ -108,13 +108,12 @@ class ActionProcessor() :
                     yield c
 
         for c in catagen(system.areas.values()) :
-            # probably not working !!!
-            for p, a in system.areas :
+            for a, p in system :
                 for e in a :
                     if e.color == c :
                         system.remove(p, e.color, e.size)
 
-        if not system.areas["star"] :
+        if not system["star"] :
             self.game.universe.removeSystem(sys)
 
 
@@ -124,6 +123,10 @@ class Universe() :
         self.game = inst
         self.systems = dict()
         self.stash = Stash()
+
+    def __iter__(self) :
+        for sysid, system in self.systems.items() :
+            yield system, sysid
 
     def newSystem(self, *stars) :
         sys = System(self, stars)
@@ -145,6 +148,13 @@ class System() :
         self.areas = {"star": [], inst.game.players[0]: [], inst.game.players[1]: []}
         for star in stars :
             self.new("star", star[1], star[0])
+
+    def __getitem__(self, key) :
+        return self.areas[key]
+
+    def __iter__(self) :
+        for p, area in self.areas.items() :
+            yield area, p
 
     def __del__(self) :
         for p, a in self.areas :

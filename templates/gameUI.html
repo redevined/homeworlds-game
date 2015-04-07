@@ -1,0 +1,78 @@
+{% extends "template.html" %}
+
+{% block script %}
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+    <script type="text/coffeescript">
+
+        root = exports ? this
+        proc = []
+        init()
+
+        init = () ->
+            proc = []
+            $('.system').click selectSystem
+
+        selectSystem = (event) ->
+            sysid = $(this).attr('id')
+            proc.push sysid
+            $('.system').off 'click'
+            $(this).children('.right, .mid').children().click selectAction
+
+        selectAction = (event) ->
+            color = $(this).attr('_color')
+            proc.push color
+            $('.system div span').off 'click'
+
+            sys = $(this).parent().parent()
+            switch color
+                when 'r' then actionAttack sys
+                when 'g' then actionBuild sys
+                when 'b' then actionTrade sys
+                when 'y' then actionMove sys
+
+        actionAttack = (sys) ->
+            size = Math.max.apply null, $.map $(sys).children('.right').children(), (ship) -> $(ship).attr('_size')
+
+            $(sys).children('.left').children().filter( (ship) ->
+                $(ship).attr('_size') <= size ).click (event) ->
+                    proc.push $(this).attr('_size') + $(this).attr('_color')
+
+        actionBuild = (sys) ->
+            colors = $.map $(sys).children('.right').children(), (ship) -> $(ship).attr('_color')
+
+            getSize = (color) ->
+                sizes = $('.stack').children().children().filter (stack) ->
+                    $(stack).attr('_n') > 0 and $(stack).attr('_color') == color
+                Math.min.apply null, $.map $(sizes), (stack) -> $(stack).attr('_size')
+
+            $('.stack').children().children().filter( (stack) ->
+                $(ship).attr('_color') in colors and $(ship).attr('_size') == getSize( $(ship).attr('_color') ) ).click (event) ->
+                    proc.push $(this).attr('_size') + $(this).attr('_color')
+
+    </script>
+    <script type="text/javascript" src="http://coffeescript.org/extras/coffee-script.js"></script>
+{% endblock %}
+
+{% block style %}game{% endblock %}
+
+{% block content %}
+    {% for system, sysid in systems %}
+         <div class="system" id="{{ sysid }}" style="top: {{ sys_map[sysid][0] }}; left: {{ sys_map[sysid][1] }};">
+            <div class="right">
+                {% for ship in system[player2] %}
+                    <span class="ship" _size="{{ ship.size }}" _color="{{ ship.color }}">{{ ship.size }}{{ ship.color }}</span>
+                {% endfor %}
+            </div>
+            <div class="mid">
+                {% for star in system['star'] %}
+                    <span class="star" class="ship" _size="{{ ship.size }}" _color="{{ ship.color }}">{{ star.size }}{{ star.color }}</span>
+                {% endfor %}
+            </div>
+            <div class="left">
+                {% for ship in system[player1] %}
+                    <span class="ship" class="ship" _size="{{ ship.size }}" _color="{{ ship.color }}">{{ ship.size }}{{ ship.color }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

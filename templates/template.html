@@ -11,6 +11,8 @@
             }
         </style>
         <link href="{{ url_for('static', filename='css/style.css') }}" type="text/css" rel="stylesheet">
+        {% block script %}
+        {% endblock %}
     </head>
     <body>
         <div class="navigation">
