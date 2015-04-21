@@ -47,7 +47,7 @@ def playGame(param) :
     if request.method == "POST" :
         gg.parse(request.form["command"])
         game.saveGame(gg)
-    return game.render(gg, render_template)
+    return render_template("gameUI.html", **game.render(gg, user.getBySession(session.get("user"))))
 
 
 # Action for login page
@@ -118,6 +118,7 @@ def rules() :
 @app.route("/about")
 def about() :
     return render_template("about.html")
+    #return render_template("about.html")
 
 
 # Error pages for various http errors
@@ -127,6 +128,16 @@ def about() :
 def exception(error) :
     code = error.code
     return render_template("error.html", code = code), code
+
+
+# DO NOT USE IN PRODUCTIVE ENVIRONMENT
+@app.route("/debug")
+def debug() :
+    cmd = "print 'Homeworlds-online app hacking CLI, use with caution!'"
+    while cmd :
+        exec cmd
+        cmd = raw_input(">>> ")
+    return "{ accomplished : true }"
 
 
 # Run app if main

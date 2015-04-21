@@ -27,9 +27,13 @@ def newGame(users) :
 def finishGame(name) :
     os.remove(os.path.join("games", name + ".p"))
 
-def render(game, template) :
-    gameUI = "gameUI.html"
-    return template(gameUI, systems = game.universe, sys_map = createSysMap(game))
+def render(game, user) :
+    return {
+        "player1" : user.username,
+        "player2" : game.otherPlayer(user.username),
+        "systems" : game.universe,
+        "sys_map" : createSysMap()
+    }
 
 def getAllGames() :
     return [openGame(path.rsplit(".", 1)[0]) for path in os.listdir("games")]

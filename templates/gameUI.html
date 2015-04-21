@@ -5,23 +5,36 @@
     <script type="text/coffeescript">
 
         root = exports ? this
-        proc = []
+        cmd = []
         init()
 
+        # Initialize cmd chain and clicks
         init = () ->
-            proc = []
+            cmd = []
+            unbind()
             $('.system').click selectSystem
 
+        # Add parameter to cmd chain
+        process = (e) ->
+            cmd.push $(this).attr('_size') + $(this).attr('_color')
+
+        # Unbind all clicks
+        unbind = () ->
+            $('.system').off 'click'
+            $('.system *').off 'click'
+
+        # Click event for systems
         selectSystem = (event) ->
             sysid = $(this).attr('id')
-            proc.push sysid
-            $('.system').off 'click'
+            cmd.push sysid
+            undbind()
             $(this).children('.right, .mid').children().click selectAction
 
+        # Click event for click on a color inside clicked system
         selectAction = (event) ->
             color = $(this).attr('_color')
-            proc.push color
-            $('.system div span').off 'click'
+            cmd.push color
+            unbind()
 
             sys = $(this).parent().parent()
             switch color
@@ -30,24 +43,49 @@
                 when 'b' then actionTrade sys
                 when 'y' then actionMove sys
 
+        # Allocate clicks based on red action
         actionAttack = (sys) ->
-            size = Math.max.apply null, $.map $(sys).children('.right').children(), (ship) -> $(ship).attr('_size')
+            size = Math.max.apply null, $(sys).children('.right').children().map( (ship) -> $(ship).attr('_size') ).get()
 
             $(sys).children('.left').children().filter( (ship) ->
                 $(ship).attr('_size') <= size ).click (event) ->
-                    proc.push $(this).attr('_size') + $(this).attr('_color')
+                    process this
 
+        # Allocate clicks for build action
         actionBuild = (sys) ->
-            colors = $.map $(sys).children('.right').children(), (ship) -> $(ship).attr('_color')
+            colors = $(sys).children('.right').children().map( (ship) -> $(ship).attr('_color') )
 
             getSize = (color) ->
-                sizes = $('.stack').children().children().filter (stack) ->
+                sizes = $('.stash').children().children().filter (stack) ->
                     $(stack).attr('_n') > 0 and $(stack).attr('_color') == color
                 Math.min.apply null, $.map $(sizes), (stack) -> $(stack).attr('_size')
 
-            $('.stack').children().children().filter( (stack) ->
-                $(ship).attr('_color') in colors and $(ship).attr('_size') == getSize( $(ship).attr('_color') ) ).click (event) ->
-                    proc.push $(this).attr('_size') + $(this).attr('_color')
+            $('.stash').children().children().filter( (stack) ->
+                $(stack).attr('_color') in colors and $(stack).attr('_size') == getSize( $(stack).attr('_color') )
+            ).click (event) ->
+                process this
+
+        # Pass click events to own ship to allocate clicks on stash (trade action)
+        actionTrade = (sys) ->
+            $(sys).children('.right').children().click (event) ->
+                process this
+                unbind()
+
+                $('.stash').children().children().filter( (stack) ->
+                    $(this).attr('_color') != $(stack).attr('_color') and $(this).attr('_size') == $(stack).attr('_size')
+                ).click (event) ->
+                    process this
+
+        # Allocate click events for move actions
+        actionMove = (sys) ->
+            $(sys).children('.right').children().click (event) ->
+                process this
+                unbind()
+
+                $('.system').filter( (sys2) ->
+                    $(sys).children('.mid').children().filter( sys2.children('.mid').children() ).length == 0
+                )click (event) ->
+                    process this
 
     </script>
     <script type="text/javascript" src="http://coffeescript.org/extras/coffee-script.js"></script>
@@ -65,12 +103,12 @@
             </div>
             <div class="mid">
                 {% for star in system['star'] %}
-                    <span class="star" class="ship" _size="{{ ship.size }}" _color="{{ ship.color }}">{{ star.size }}{{ star.color }}</span>
+                    <span class="star"_size="{{ star.size }}" _color="{{ star.color }}">{{ star.size }}{{ star.color }}</span>
                 {% endfor %}
             </div>
             <div class="left">
                 {% for ship in system[player1] %}
-                    <span class="ship" class="ship" _size="{{ ship.size }}" _color="{{ ship.color }}">{{ ship.size }}{{ ship.color }}</span>
+                    <span class="ship" _size="{{ ship.size }}" _color="{{ ship.color }}">{{ ship.size }}{{ ship.color }}</span>
                 {% endfor %}
             </div>
         </div>
