@@ -1,27 +1,45 @@
 <html>
 	<head>
 		<link href="/static/css/bootstrap.min.css" rel="stylesheet">
-		<link href="/static/css/game.css" rel="stylesheet">
+		<link href="/static/css/homeworlds.css" rel="stylesheet">
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 		<script src="/static/js/bootstrap.min.js"></script>
-		<script src="/static/js/game.compiled.js"></script>
+		<script src="/static/js/homeworlds.js"></script>
 
 		<script type="text/javascript">
 			$(function() {
+				var current, game;
+
 				current = JSON.parse("{}");
 				game = Game(current);
+				game.render( $("#board") );
+
+				$("#next-turn").click(function() {
+					$.ajax({
+						type : "POST",
+						url : "/game",
+						data: game.toJson(),
+						contentType: "application/json;charset=UTF-8"
+					});
+				});
 			});
 		</script>
 	</head>
 	<body>
-		<div id="site-wrapper">
-			<div id="board-wrapper">
-				<div id="board">
+		<div id="board-wrapper">
+			<div id="board">
 
-					Hello World!
+				<!-- Here comes the game! -->
 
+				<div id="controls-wrapper">
+					<div id="controls">
+						<button id="give-up">Give up</button>
+						<button id="return">Return</button>
+						<button id="next-turn">Next turn</button>
+					</div>
 				</div>
+
 			</div>
 		</div>
 	</body>

@@ -82,10 +82,8 @@ class Element
 	constructor: (e) ->
 		@e = $(e)
 
-	destroy: () ->
-		@e.remove()
-
 	render: (surface) ->
+		@e.detach()
 		surface.append(@e)
 
 
@@ -117,7 +115,9 @@ class Stash extends Element
 		super(surface)
 
 	add: (obj) ->
-		@stack[obj.color][obj.size - 1] << Stashed(obj)
+		stashed = Stashed(obj)
+		@stack[obj.color][obj.size - 1] << stashed
+		stashed.render(@e.find(".stash-#{stashed.color} td:nth-child(#{stashed.size})"))
 
 	getShip: (color, size) ->
 		Ship(@stack[obj.color][obj.size - 1].pop())
@@ -136,7 +136,6 @@ class Stashable extends Element
 
 	destroy: () ->
 		game.stash.add(@)
-		super()
 
 
 class Stashed extends Stashable
@@ -176,23 +175,14 @@ class System extends Element
 			<div class="system-clear">
 				<div class="system" style="top: #{@pos[1]}; left: #{@pos[0]};">
 					<div class="ships-left">
-						<!-- Player 2 ships -->
 					</div>
 					<div class="stars">
-						<!-- Stars -->
 					</div>
 					<div class="ships-right">
-						<!-- Player 1 ships -->
 					</div>
 				</div>
 			</div>
 		""")
-
-	destroy: () ->
-		star.destroy() for star in @stars
-		ship.destroy() for ship in @ships[1]
-		ship.destroy() for ship in @ships[2]
-		super()
 
 	render: (surface) ->
 		star.render(@e.find(".stars")) for star in @stars
@@ -202,26 +192,42 @@ class System extends Element
 
 	addShip: (player, ship) ->
 		@ships[player.id] << ship
+		ship.render(@e.find(".ships-right" if player.id == 1 else ".ships-left"))
 
-	removeShip: (player, ship) ->
+	getShip: (player, ship) ->
 		index = @ships[player.id].indexOf(ship)
 		ship = @ships[player.id].splice(index, 1)
 		if not ships[1] and not ships[2]
 			@destroy()
 		ship
 
-	removeStar: (star) ->
-		index = @stars.indexOf(ship)
-		star = @stars.splice(index, 1)
+	removeStar: (player, star) ->
+		index = @stars.indexOf(star)
+		@stars.splice(index, 1).destroy()
 		if not stars
 			@destroy()
-		star
+
+	destroy: () ->
+		star.destroy() for star in @stars
+		ship.destroy() for ship in @ships[1]
+		ship.destroy() for ship in @ships[2]
 
 
 class Game extends Element
 
 	constructor: (current) ->
 		@players = (Player(p) for p in current.players)
-		if not current.new
-			@systems = (System(s) for s in current.systems)
-			@stash = Stash(current.stash)
+		@systems = (System(s) for s in current.systems)
+		@stash = Stash(current.stash)
+		super("""
+			<div id="game">
+			</div>
+		""")
+
+	render: (surface) ->
+		system.render(@e) for system in @systems
+		@stash.render(@e)
+		super(surface)
+
+	toJson: () ->
+		JSON.stringify(@)
