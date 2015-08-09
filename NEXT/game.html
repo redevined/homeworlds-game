@@ -11,9 +11,152 @@
 			$(function() {
 				var current, game;
 
-				current = JSON.parse("{}");
+				current = JSON.parse(
+					"{" +
+					"    \"systems\": [" +
+					"        {" +
+					"            \"pos\": [500, 200]," +
+					"            \"stars\": [" +
+					"                {" +
+					"                    \"color\": \"red\"," +
+					"                    \"size\": 2" +
+					"                }," +
+					"                {" +
+					"                    \"color\": \"yellow\"," +
+					"                    \"size\": 1" +
+					"                }" +
+					"            ]," +
+					"            \"ships\": {" +
+					"                \"1\": [" +
+					"                    {" +
+					"                        \"color\": \"green\"," +
+					"                        \"size\": 3" +
+					"                    }" +
+					"                ]," +
+					"                \"2\": []" +
+					"            }" +
+					"        }," +
+					"        {" +
+					"            \"pos\": [500, 800]," +
+					"            \"stars\": [" +
+					"                {" +
+					"                    \"color\": \"blue\"," +
+					"                    \"size\": 1" +
+					"                }," +
+					"                {" +
+					"                    \"color\": \"green\"," +
+					"                    \"size\": 3" +
+					"                }" +
+					"            ]," +
+					"            \"ships\": {" +
+					"                \"1\": []," +
+					"                \"2\": [" +
+					"                    {" +
+					"                        \"color\": \"yellow\"," +
+					"                        \"size\": 3" +
+					"                    }" +
+					"                ]" +
+					"            }" +
+					"        }" +
+					"    ]," +
+					"    \"players\": [" +
+					"        {" +
+					"            \"id\": 1," +
+					"            \"name\": \"Alpha\"," +
+					"            \"actions\": 1" +
+					"        }," +
+					"        {" +
+					"            \"id\": 2," +
+					"            \"name\": \"Beta\"," +
+					"            \"actions\": 0" +
+					"        }" +
+					"    ]," +
+					"    \"stash\": {" +
+					"        \"red\": [" +
+					"            [" +
+					"                {" +
+					"                    \"color\": \"red\"," +
+					"                    \"size\": 1" +
+					"                }" +
+					"            ]," +
+					"            [" +
+					"                {" +
+					"                    \"color\": \"red\"," +
+					"                    \"size\": 2" +
+					"                }" +
+					"            ]," +
+					"            [" +
+					"                {" +
+					"                    \"color\": \"red\"," +
+					"                    \"size\": 3" +
+					"                }" +
+					"            ]" +
+					"        ]," +
+					"        \"green\": [" +
+					"            [" +
+					"                {" +
+					"                    \"color\": \"green\"," +
+					"                    \"size\": 1" +
+					"                }" +
+					"            ]," +
+					"            [" +
+					"                {" +
+					"                    \"color\": \"green\"," +
+					"                    \"size\": 2" +
+					"                }" +
+					"            ]," +
+					"            [" +
+					"                {" +
+					"                    \"color\": \"green\"," +
+					"                    \"size\": 3" +
+					"                }" +
+					"            ]" +
+					"    ]," +
+					"        \"blue\": [" +
+					"            [" +
+					"                {" +
+					"                    \"color\": \"blue\"," +
+					"                    \"size\": 1" +
+					"                }" +
+					"            ]," +
+					"            [" +
+					"                {" +
+					"                    \"color\": \"blue\"," +
+					"                    \"size\": 2" +
+					"                }" +
+					"            ]," +
+					"            [" +
+					"                {" +
+					"                    \"color\": \"blue\"," +
+					"                    \"size\": 3" +
+					"                }" +
+					"            ]" +
+					"        ]," +
+					"        \"yellow\": [" +
+					"            [" +
+					"                {" +
+					"                    \"color\": \"yellow\"," +
+					"                    \"size\": 1" +
+					"                }" +
+					"            ]," +
+					"            [" +
+					"                {" +
+					"                    \"color\": \"yellow\"," +
+					"                    \"size\": 2" +
+					"                }" +
+					"            ]," +
+					"            [" +
+					"                {" +
+					"                    \"color\": \"yellow\"," +
+					"                    \"size\": 3" +
+					"                }" +
+					"            ]" +
+					"        ]" +
+					"    }" +
+					"}"
+				);
 				game = Game(current);
-				game.render( $("#board") );
+				game.render( $("#game-wrapper") );
 
 				$("#next-turn").click(function() {
 					$.ajax({
@@ -30,11 +173,12 @@
 		<div id="board-wrapper">
 			<div id="board">
 
-				<!-- Here comes the game! -->
+				<div id="game-wrapper">
+					<!-- Here comes the game! -->
+				</div>
 
 				<div id="controls-wrapper">
 					<div id="controls">
-						<button id="give-up">Give up</button>
 						<button id="return">Return</button>
 						<button id="next-turn">Next turn</button>
 					</div>

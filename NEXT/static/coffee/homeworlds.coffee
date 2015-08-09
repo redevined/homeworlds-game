@@ -6,7 +6,7 @@ Example json
 {
 	"systems": [
 		{
-			"pos": [50, 10],
+			"pos": [500, 200],
 			"stars": [
 				{
 					"color": "red",
@@ -18,17 +18,17 @@ Example json
 				}
 			],
 			"ships": {
-				1: [
+				"1": [
 					{
 						"color": "green",
 						"size": 3
 					}
 				],
-				2: []
+				"2": []
 			}
 		},
 		{
-			"pos": [50, 90],
+			"pos": [500, 800],
 			"stars": [
 				{
 					"color": "blue",
@@ -40,8 +40,8 @@ Example json
 				}
 			],
 			"ships": {
-				1: [],
-				2: [
+				"1": [],
+				"2": [
 					{
 						"color": "yellow",
 						"size": 3
@@ -61,7 +61,89 @@ Example json
 			"name": "Beta",
 			"actions": 0
 		}
-	]
+	],
+	"stash": {
+		"red": [
+			[
+				{
+					"color": "red",
+					"size": 1
+				}
+			],
+			[
+				{
+					"color": "red",
+					"size": 2
+				}
+			],
+			[
+				{
+					"color": "red",
+					"size": 3
+				}
+			]
+		],
+		"green": [
+			[
+				{
+					"color": "green",
+					"size": 1
+				}
+			],
+			[
+				{
+					"color": "green",
+					"size": 2
+				}
+			],
+			[
+				{
+					"color": "green",
+					"size": 3
+				}
+			]
+	],
+		"blue": [
+			[
+				{
+					"color": "blue",
+					"size": 1
+				}
+			],
+			[
+				{
+					"color": "blue",
+					"size": 2
+				}
+			],
+			[
+				{
+					"color": "blue",
+					"size": 3
+				}
+			]
+		],
+		"yellow": [
+			[
+				{
+					"color": "yellow",
+					"size": 1
+				}
+			],
+			[
+				{
+					"color": "yellow",
+					"size": 2
+				}
+			],
+			[
+				{
+					"color": "yellow",
+					"size": 3
+				}
+			]
+		]
+	}
 }
 ###
 
@@ -108,10 +190,10 @@ class Stash extends Element
 			tr = $("<tr></tr>")
 			for ships in shipgroups
 				td = $("<td></td>")
-				for ship in ships :
+				for ship in ships
 					ship.render(td)
 				tr.append(td)
-			@e.find(".stash")append(tr)
+			@e.find(".stash").append(tr)
 		super(surface)
 
 	add: (obj) ->
@@ -173,7 +255,7 @@ class System extends Element
 		}
 		super("""
 			<div class="system-clear">
-				<div class="system" style="top: #{@pos[1]}; left: #{@pos[0]};">
+				<div class="system" style="top: #{@pos[1] - 100}; left: #{@pos[0] - 100};">
 					<div class="ships-left">
 					</div>
 					<div class="stars">
@@ -192,7 +274,7 @@ class System extends Element
 
 	addShip: (player, ship) ->
 		@ships[player.id] << ship
-		ship.render(@e.find(".ships-right" if player.id == 1 else ".ships-left"))
+		ship.render(@e.find([".ships-right", ".ships-left"][player.id - 1]))
 
 	getShip: (player, ship) ->
 		index = @ships[player.id].indexOf(ship)
